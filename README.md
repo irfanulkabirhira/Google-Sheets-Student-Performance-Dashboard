@@ -6,9 +6,10 @@ This project provides real-time insights into student performance, tracks assign
 
 ---
 
-## 🚀 Live Deployment
+## 🚀 Live Demo
 
-👉 [Open Dashboard](https://script.google.com/macros/s/AKfycbwg1N-steAcbBXiArpiK7we0g47JHYHpPtswUXROO40ZnLal7LfN1B4CtdMl7XLFSQK/exec)
+👉 **Dashboard Link:**
+https://script.google.com/macros/s/AKfycbwg1N-steAcbBXiArpiK7we0g47JHYHpPtswUXROO40ZnLal7LfN1B4CtdMl7XLFSQK/exec
 
 ---
 
@@ -17,7 +18,7 @@ This project provides real-time insights into student performance, tracks assign
 ### 📌 Data Integration
 
 * Live connection with **Google Sheets**
-* Automatically fetches data from `Assignments` sheet
+* Automatically fetches data from the `Assignments` sheet
 
 ### 📊 Dashboard Analytics
 
@@ -29,11 +30,11 @@ This project provides real-time insights into student performance, tracks assign
 
 ### 📈 Visualizations (Plotly.js)
 
-* Score trend over time
-* Subject-wise performance
-* Assignment status breakdown
-* Student completion ranking
-* Risk analysis (low score + overdue)
+* 📉 Score trend over time
+* 📊 Subject-wise performance
+* 🥧 Assignment status breakdown
+* 🏆 Student completion ranking
+* ⚠️ Risk analysis (low score + overdue)
 
 ### 🔍 Smart Filtering
 
@@ -46,15 +47,15 @@ This project provides real-time insights into student performance, tracks assign
 
 * Highlights low scores
 * Flags overdue assignments
-* Displays smart status badges (On Track / Risk)
+* Displays smart badges (On Track / Risk / Overdue)
 
 ### 📧 Automation (Email Notification)
 
-* Automatically sends email when:
+Automatically sends email when:
 
-  ```
-  Status changes: Pending → Graded
-  ```
+```
+Status changes: Pending → Graded
+```
 
 ---
 
@@ -73,8 +74,8 @@ This project provides real-time insights into student performance, tracks assign
 ```
 student-performance-dashboard/
 │
-├── index.html     # Frontend UI
-├── Code.gs        # Backend logic (Apps Script)
+├── index.html     # Frontend UI (Dashboard)
+├── Code.gs        # Backend (Apps Script logic)
 └── README.md
 ```
 
@@ -104,11 +105,15 @@ Due Date
 
 ## ⚙️ Setup Instructions
 
-### 1. Open Google Sheet
+### 1. Open Google Sheets
+
+Go to:
 
 ```
 Extensions → Apps Script
 ```
+
+---
 
 ### 2. Add Project Files
 
@@ -116,6 +121,10 @@ Create:
 
 * `index.html`
 * `Code.gs`
+
+Paste the respective code.
+
+---
 
 ### 3. Configure Spreadsheet
 
@@ -126,20 +135,25 @@ const SPREADSHEET_ID = "YOUR_SPREADSHEET_ID";
 const SHEET_NAME = "Assignments";
 ```
 
-### 4. Deploy the App
+---
+
+### 4. Deploy Web App
 
 1. Click **Deploy → New Deployment**
 2. Select **Web App**
-3. Set access:
+3. Configure:
 
-   ```
-   Anyone with the link
-   ```
-4. Deploy and authorize
+   * Execute as → `Me`
+   * Who has access → **Anyone**
+4. Click **Deploy**
+5. Authorize permissions
+6. Copy the `/exec` URL
+
+---
 
 ### 5. Enable Email Automation
 
-Add trigger:
+Add a trigger:
 
 | Function               | Event   |
 | ---------------------- | ------- |
@@ -149,12 +163,24 @@ Add trigger:
 
 ## 🎯 Use Case
 
-Built for **10 Minute School Internship Assessment** to:
+Built as part of an **internship assessment for 10 Minute School**.
 
-* Track student performance
-* Identify low-performing students
-* Monitor assignment completion
+Helps educators and admins to:
+
+* Monitor student performance
+* Identify weak students
+* Track assignment completion
 * Automate grading notifications
+
+---
+
+## 📌 Highlights
+
+* Fully serverless (Google Apps Script)
+* Real-time data sync with Google Sheets
+* Interactive UI with modern dashboard design
+* Automated email workflow
+* Scalable for real-world education systems
 
 ---
 
@@ -166,4 +192,4 @@ Built for **10 Minute School Internship Assessment** to:
 
 ## ⭐ Support
 
-If you like this project, give it a ⭐ on GitHub!
+If you like this project, consider giving it a ⭐ on GitHub!
