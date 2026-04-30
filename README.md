@@ -8,8 +8,7 @@ This project provides real-time insights into student performance, tracks assign
 
 ## 🚀 Live Deployment
 
-🔗 **Dashboard Link:**
-https://script.google.com/macros/s/AKfycbwg1N-steAcbBXiArpiK7we0g47JHYHpPtswUXROO40ZnLal7LfN1B4CtdMl7XLFSQK/exec
+👉 [Open Dashboard](https://script.google.com/macros/s/AKfycbwg1N-steAcbBXiArpiK7we0g47JHYHpPtswUXROO40ZnLal7LfN1B4CtdMl7XLFSQK/exec)
 
 ---
 
@@ -107,13 +106,9 @@ Due Date
 
 ### 1. Open Google Sheet
 
-Go to:
-
 ```
 Extensions → Apps Script
 ```
-
----
 
 ### 2. Add Project Files
 
@@ -121,10 +116,6 @@ Create:
 
 * `index.html`
 * `Code.gs`
-
-Paste your respective codes.
-
----
 
 ### 3. Configure Spreadsheet
 
@@ -135,8 +126,6 @@ const SPREADSHEET_ID = "YOUR_SPREADSHEET_ID";
 const SHEET_NAME = "Assignments";
 ```
 
----
-
 ### 4. Deploy the App
 
 1. Click **Deploy → New Deployment**
@@ -146,43 +135,25 @@ const SHEET_NAME = "Assignments";
    ```
    Anyone with the link
    ```
-4. Click **Deploy**
-5. Authorize permissions
-6. Copy deployment URL
-
----
+4. Deploy and authorize
 
 ### 5. Enable Email Automation
 
-1. Go to **Triggers**
-2. Add new trigger:
+Add trigger:
 
-| Setting  | Value                  |
-| -------- | ---------------------- |
-| Function | sendGradedNotification |
-| Event    | On edit                |
-
----
-
-## 📸 Screenshots
-
-*Add your dashboard screenshots here for better presentation*
-
-```
-/screenshots/dashboard.png
-```
+| Function               | Event   |
+| ---------------------- | ------- |
+| sendGradedNotification | On edit |
 
 ---
 
 ## 🎯 Use Case
 
-Built as part of an internship assessment for **10 Minute School (Content Operations Team)**.
+Built for **10 Minute School Internship Assessment** to:
 
-Helps educators and admins to:
-
-* Monitor student performance
-* Identify weak students
-* Track assignment completion
+* Track student performance
+* Identify low-performing students
+* Monitor assignment completion
 * Automate grading notifications
 
 ---
@@ -193,15 +164,6 @@ Helps educators and admins to:
 
 ---
 
-## 📌 Notes
-
-* Fully serverless (runs on Google Apps Script)
-* No external backend required
-* Fast, lightweight, and scalable
-* Easily extendable for real-world education systems
-
----
-
 ## ⭐ Support
 
-If you like this project, consider giving it a ⭐ on GitHub!
+If you like this project, give it a ⭐ on GitHub!
