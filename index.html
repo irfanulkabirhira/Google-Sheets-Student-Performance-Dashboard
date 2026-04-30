@@ -1,0 +1,1278 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Student Performance Report Dashboard</title>
+  <script src="https://cdn.plot.ly/plotly-3.5.0.min.js"></script>
+  <!-- <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800;900&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300&display=swap" rel="stylesheet"> -->
+
+  <style>
+    :root {
+      --bg: #07080f;
+      --surface: #0e1018;
+      --card: #12141e;
+      --card2: #181b27;
+      --border: rgba(255, 255, 255, .07);
+      --border2: rgba(255, 255, 255, .12);
+      --text: #f0f2fc;
+      --muted: #7c7f9a;
+      --dim: #4a4d66;
+
+      --blue: #4f7cff;
+      --blue-glow: rgba(79, 124, 255, .25);
+      --teal: #2de3c5;
+      --teal-glow: rgba(45, 227, 197, .18);
+      --amber: #ffb547;
+      --amber-glow: rgba(255, 181, 71, .18);
+      --red: #ff5c6e;
+      --red-glow: rgba(255, 92, 110, .18);
+      --green: #3ddc84;
+      --green-glow: rgba(61, 220, 132, .18);
+      --violet: #b57bff;
+      --violet-glow: rgba(181, 123, 255, .18);
+
+      /* --font-display: 'Syne', sans-serif;
+      --font-body: 'DM Sans', sans-serif; */
+      --font-display: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+      --font-body: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+      --radius: 18px;
+      --radius-sm: 12px;
+    }
+
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font-body);
+      font-size: 15px;
+      line-height: 1.6;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ─── Noise texture overlay ─── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E");
+      opacity: .025;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ─── Header ─── */
+    header {
+      position: relative;
+      padding: 72px 40px 100px;
+      overflow: hidden;
+    }
+
+    header::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 80% 60% at 10% 30%, rgba(79, 124, 255, .22) 0%, transparent 65%),
+        radial-gradient(ellipse 50% 50% at 85% 80%, rgba(181, 123, 255, .14) 0%, transparent 60%),
+        radial-gradient(ellipse 40% 40% at 60% 10%, rgba(45, 227, 197, .10) 0%, transparent 60%);
+      z-index: 0;
+    }
+
+    /* grid lines */
+    header::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(255, 255, 255, .03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, .03) 1px, transparent 1px);
+      background-size: 48px 48px;
+      z-index: 0;
+    }
+
+    .header-inner {
+      position: relative;
+      z-index: 1;
+      max-width: 1320px;
+      margin: 0 auto;
+    }
+
+    .header-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(79, 124, 255, .15);
+      border: 1px solid rgba(79, 124, 255, .3);
+      color: var(--blue);
+      font-family: var(--font-body);
+      font-size: .78rem;
+      font-weight: 600;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      padding: 6px 14px;
+      border-radius: 999px;
+      margin-bottom: 24px;
+    }
+
+    .header-eyebrow span {
+      width: 6px;
+      height: 6px;
+      background: var(--blue);
+      border-radius: 50%;
+      display: inline-block;
+      animation: pulse 2s ease infinite;
+    }
+
+    @keyframes pulse {
+
+      0%,
+      100% {
+        opacity: 1;
+        transform: scale(1);
+      }
+
+      50% {
+        opacity: .5;
+        transform: scale(1.4);
+      }
+    }
+
+    h1 {
+      font-family: var(--font-display);
+      font-size: clamp(2.4rem, 5vw, 4.2rem);
+      font-weight: 900;
+      letter-spacing: -.04em;
+      line-height: 1;
+      margin-bottom: 20px;
+      color: #fff;
+    }
+
+    h1 em {
+      font-style: normal;
+      background: linear-gradient(135deg, var(--blue) 0%, var(--teal) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .header-sub {
+      color: var(--muted);
+      font-size: 1.05rem;
+      font-weight: 300;
+      max-width: 620px;
+      line-height: 1.7;
+    }
+
+    /* ─── Layout ─── */
+    main {
+      max-width: 1320px;
+      margin: -56px auto 0;
+      padding: 0 32px 64px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .section {
+      margin-bottom: 24px;
+    }
+
+    /* ─── Cards / Panels ─── */
+    .panel,
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .panel {
+      padding: 28px 32px;
+    }
+
+    /* Subtle top accent line */
+    .panel::before,
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, .08), transparent);
+    }
+
+    /* ─── Source / Top Panel ─── */
+    .top-panel {
+      display: grid;
+      grid-template-columns: 1.1fr .9fr;
+      gap: 20px;
+    }
+
+    .source-box {
+      background: linear-gradient(145deg, rgba(79, 124, 255, .08), rgba(45, 227, 197, .04));
+      border: 1px solid rgba(79, 124, 255, .25);
+      border-radius: var(--radius);
+      padding: 28px 32px;
+    }
+
+    .source-title {
+      font-family: var(--font-display);
+      font-size: 1rem;
+      font-weight: 800;
+      letter-spacing: -.01em;
+      color: #fff;
+      margin-bottom: 10px;
+    }
+
+    .hint {
+      color: var(--muted);
+      font-size: .9rem;
+      line-height: 1.65;
+      font-weight: 300;
+    }
+
+    code {
+      background: rgba(79, 124, 255, .15);
+      color: var(--blue);
+      padding: 2px 8px;
+      border-radius: 6px;
+      font-size: .85em;
+      font-family: 'DM Mono', 'Fira Code', monospace;
+    }
+
+    button {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 20px;
+      padding: 12px 24px;
+      background: linear-gradient(135deg, var(--blue), #6a8fff);
+      color: #fff;
+      font-family: var(--font-body);
+      font-size: .9rem;
+      font-weight: 600;
+      border: none;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: all .2s ease;
+      box-shadow: 0 8px 24px var(--blue-glow);
+      letter-spacing: .01em;
+    }
+
+    button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 14px 32px var(--blue-glow);
+      background: linear-gradient(135deg, #6a8fff, var(--blue));
+    }
+
+    button::before {
+      content: '↻';
+      font-size: 1rem;
+    }
+
+    .status {
+      margin-top: 14px;
+      color: var(--dim);
+      font-size: .84rem;
+    }
+
+    .status strong {
+      color: var(--teal);
+    }
+
+    /* ─── Meta grid ─── */
+    .meta-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
+
+    .meta {
+      background: var(--card2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 16px 18px;
+    }
+
+    .meta .label {
+      color: var(--dim);
+      font-size: .72rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: .09em;
+      margin-bottom: 6px;
+    }
+
+    .meta .value {
+      font-family: var(--font-display);
+      font-size: 1rem;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    /* ─── Filters ─── */
+    .filters {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+    }
+
+    .filters.search-row {
+      grid-template-columns: 1fr;
+      margin-top: 16px;
+    }
+
+    label {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      color: var(--muted);
+      font-size: .78rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+    }
+
+    select,
+    input[type=date],
+    input[type=search] {
+      width: 100%;
+      padding: 11px 14px;
+      background: var(--card2);
+      border: 1px solid var(--border2);
+      border-radius: var(--radius-sm);
+      color: var(--text);
+      font-family: var(--font-body);
+      font-size: .92rem;
+      outline: none;
+      transition: border-color .2s, box-shadow .2s;
+      appearance: none;
+      -webkit-appearance: none;
+    }
+
+    select {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%237c7f9a' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 14px center;
+      padding-right: 38px;
+    }
+
+    select:focus,
+    input:focus {
+      border-color: var(--blue);
+      box-shadow: 0 0 0 3px var(--blue-glow);
+    }
+
+    input[type=date]::-webkit-calendar-picker-indicator {
+      filter: invert(.5);
+      cursor: pointer;
+    }
+
+    /* ─── KPIs ─── */
+    .kpis {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .kpi {
+      padding: 22px 22px 20px;
+      position: relative;
+    }
+
+    .kpi-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+      margin-bottom: 14px;
+    }
+
+    .kpi .label {
+      color: var(--muted);
+      font-size: .75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      margin-bottom: 8px;
+    }
+
+    .kpi .value {
+      font-family: var(--font-display);
+      font-size: 2.1rem;
+      font-weight: 900;
+      letter-spacing: -.05em;
+      line-height: 1;
+    }
+
+    /* corner glow orbs */
+    .kpi::after {
+      content: '';
+      position: absolute;
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      bottom: -30px;
+      right: -20px;
+      opacity: .4;
+    }
+
+    .kpi.kpi-blue .kpi-icon {
+      background: var(--blue-glow);
+      color: var(--blue);
+    }
+
+    .kpi.kpi-blue .value {
+      color: var(--blue);
+    }
+
+    .kpi.kpi-blue::after {
+      background: var(--blue);
+    }
+
+    .kpi.kpi-teal .kpi-icon {
+      background: var(--teal-glow);
+      color: var(--teal);
+    }
+
+    .kpi.kpi-teal .value {
+      color: var(--teal);
+    }
+
+    .kpi.kpi-teal::after {
+      background: var(--teal);
+    }
+
+    .kpi.kpi-green .kpi-icon {
+      background: var(--green-glow);
+      color: var(--green);
+    }
+
+    .kpi.kpi-green .value {
+      color: var(--green);
+    }
+
+    .kpi.kpi-green::after {
+      background: var(--green);
+    }
+
+    .kpi.kpi-red .kpi-icon {
+      background: var(--red-glow);
+      color: var(--red);
+    }
+
+    .kpi.kpi-red .value {
+      color: var(--red);
+    }
+
+    .kpi.kpi-red::after {
+      background: var(--red);
+    }
+
+    .kpi.kpi-amber .kpi-icon {
+      background: var(--amber-glow);
+      color: var(--amber);
+    }
+
+    .kpi.kpi-amber .value {
+      color: var(--amber);
+    }
+
+    .kpi.kpi-amber::after {
+      background: var(--amber);
+    }
+
+    /* ─── Dashboard grid ─── */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px;
+    }
+
+    .card {
+      padding: 22px 22px 16px;
+    }
+
+    .wide {
+      grid-column: 1 / -1;
+    }
+
+    .card-header {
+      margin-bottom: 4px;
+    }
+
+    .title {
+      font-family: var(--font-display);
+      font-size: .95rem;
+      font-weight: 800;
+      letter-spacing: -.01em;
+      color: #fff;
+    }
+
+    .note {
+      color: var(--dim);
+      font-size: .8rem;
+      margin-top: 4px;
+      line-height: 1.45;
+      font-weight: 300;
+    }
+
+    .chart-divider {
+      height: 1px;
+      background: var(--border);
+      margin: 14px 0 6px;
+    }
+
+    .plot {
+      height: 340px;
+      width: 100%;
+    }
+
+    /* ─── Table ─── */
+    .table-wrap {
+      overflow: auto;
+      max-height: 520px;
+      margin-top: 14px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 980px;
+      font-size: .88rem;
+    }
+
+    thead {
+      position: sticky;
+      top: 0;
+      z-index: 2;
+    }
+
+    th {
+      background: var(--card2);
+      color: var(--dim);
+      font-size: .7rem;
+      text-transform: uppercase;
+      letter-spacing: .1em;
+      padding: 13px 14px;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    td {
+      padding: 12px 14px;
+      border-bottom: 1px solid rgba(255, 255, 255, .04);
+      color: var(--text);
+      vertical-align: middle;
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    tbody tr:hover td {
+      background: rgba(255, 255, 255, .025);
+    }
+
+    td.low-score {
+      color: var(--red);
+      font-weight: 700;
+    }
+
+    td.overdue {
+      color: var(--amber);
+      font-weight: 600;
+    }
+
+    /* ─── Badges ─── */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      border-radius: 999px;
+      padding: 4px 10px;
+      font-weight: 600;
+      font-size: .72rem;
+      letter-spacing: .03em;
+      white-space: nowrap;
+    }
+
+    .badge::before {
+      content: '';
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      display: inline-block;
+    }
+
+    .red {
+      background: rgba(255, 92, 110, .12);
+      color: var(--red);
+      border: 1px solid rgba(255, 92, 110, .25);
+    }
+
+    .red::before {
+      background: var(--red);
+    }
+
+    .yellow {
+      background: rgba(255, 181, 71, .12);
+      color: var(--amber);
+      border: 1px solid rgba(255, 181, 71, .25);
+    }
+
+    .yellow::before {
+      background: var(--amber);
+    }
+
+    .green {
+      background: rgba(61, 220, 132, .12);
+      color: var(--green);
+      border: 1px solid rgba(61, 220, 132, .25);
+    }
+
+    .green::before {
+      background: var(--green);
+    }
+
+    .blue {
+      background: rgba(79, 124, 255, .12);
+      color: var(--blue);
+      border: 1px solid rgba(79, 124, 255, .25);
+    }
+
+    .blue::before {
+      background: var(--blue);
+    }
+
+    /* ─── Filter status bar ─── */
+    #filterStatus {
+      margin-top: 18px;
+      padding: 10px 16px;
+      background: rgba(79, 124, 255, .07);
+      border: 1px solid rgba(79, 124, 255, .15);
+      border-radius: var(--radius-sm);
+      color: var(--muted);
+      font-size: .84rem;
+    }
+
+    #filterStatus strong {
+      color: var(--teal);
+    }
+
+    /* ─── Empty / Loading state ─── */
+    .empty {
+      text-align: center;
+      padding: 80px 24px;
+      color: var(--dim);
+      border: 1px dashed var(--border2);
+      border-radius: var(--radius);
+      background: var(--card);
+    }
+
+    .empty-icon {
+      font-size: 2.5rem;
+      margin-bottom: 12px;
+      opacity: .4;
+    }
+
+    /* ─── Scrollbar ─── */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: var(--border2);
+      border-radius: 99px;
+    }
+
+    /* ─── Animations ─── */
+    @keyframes fadeUp {
+      from {
+        opacity: 0;
+        transform: translateY(18px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .kpi,
+    .card,
+    .panel {
+      animation: fadeUp .45s ease both;
+    }
+
+    .kpis .kpi:nth-child(1) {
+      animation-delay: .05s
+    }
+
+    .kpis .kpi:nth-child(2) {
+      animation-delay: .10s
+    }
+
+    .kpis .kpi:nth-child(3) {
+      animation-delay: .15s
+    }
+
+    .kpis .kpi:nth-child(4) {
+      animation-delay: .20s
+    }
+
+    .kpis .kpi:nth-child(5) {
+      animation-delay: .25s
+    }
+
+    /* ─── Responsive ─── */
+    @media (max-width: 1050px) {
+
+      .top-panel,
+      .filters,
+      .kpis,
+      .grid,
+      .meta-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .wide {
+        grid-column: auto;
+      }
+
+      main {
+        padding: 0 16px 40px;
+      }
+
+      header {
+        padding: 48px 20px 88px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <header>
+    <div class="header-inner">
+      <div class="header-eyebrow">
+        <span></span>
+        Live Dashboard
+      </div>
+      <h1>Student <em>Performance</em><br>Report Dashboard</h1>
+      <p class="header-sub">
+        Real-time analytics for tracking scores, assignment completion,
+        risk flags, and subject-wise performance — powered by Google Sheets.
+      </p>
+    </div>
+  </header>
+
+  <main>
+
+    <!-- Source + Summary -->
+    <section class="section top-panel panel" style="background:var(--card);border-color:var(--border);">
+      <div class="source-box">
+        <div class="source-title">Live Data Source</div>
+        <div class="hint">
+          Connected directly to the <code>Assignments</code> tab in Google Sheets.
+          Click refresh after updating the sheet.
+        </div>
+        <button id="refreshBtn">Refresh Sheet Data</button>
+        <div class="status" id="uploadStatus">Loading data from Google Sheet…</div>
+      </div>
+
+      <div>
+        <div class="source-title">Dashboard Summary</div>
+        <div class="meta-grid">
+          <div class="meta">
+            <div class="label">Source</div>
+            <div class="value">Google Sheets</div>
+          </div>
+          <div class="meta">
+            <div class="label">Sheet Tab</div>
+            <div class="value">Assignments</div>
+          </div>
+          <div class="meta">
+            <div class="label">Subjects</div>
+            <div class="value">7 Subjects</div>
+          </div>
+          <div class="meta">
+            <div class="label">Automation</div>
+            <div class="value">Email Trigger Ready</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Filters -->
+    <section class="panel section" id="filterPanel" style="display:none">
+      <div class="source-title" style="margin-bottom:18px">Interactive Filters</div>
+      <div class="filters">
+        <label>Subject<select id="subjectFilter"><option value="__all__">All Subjects</option></select></label>
+        <label>Status<select id="statusFilter"><option value="__all__">All Statuses</option></select></label>
+        <label>Due From<input id="fromDate" type="date"></label>
+        <label>Due To<input id="toDate" type="date"></label>
+      </div>
+      <div class="filters search-row">
+        <label>Search Student or Email<input id="searchInput" type="search" placeholder="e.g. Student 1 or student@example.com"></label>
+      </div>
+      <div id="filterStatus"></div>
+    </section>
+
+    <!-- KPIs -->
+    <section class="kpis" id="kpis" style="display:none">
+      <div class="card kpi kpi-blue">
+        <div class="kpi-icon">📋</div>
+        <div class="label">Total Records</div>
+        <div class="value" id="totalRecords">0</div>
+      </div>
+      <div class="card kpi kpi-teal">
+        <div class="kpi-icon">📊</div>
+        <div class="label">Average Score</div>
+        <div class="value" id="avgScore">0%</div>
+      </div>
+      <div class="card kpi kpi-green">
+        <div class="kpi-icon">✅</div>
+        <div class="label">Completed / Graded</div>
+        <div class="value" id="completedCount">0</div>
+      </div>
+      <div class="card kpi kpi-red">
+        <div class="kpi-icon">⚠️</div>
+        <div class="label">Low Scores &lt; 50%</div>
+        <div class="value" id="lowScoreCount">0</div>
+      </div>
+      <div class="card kpi kpi-amber">
+        <div class="kpi-icon">🕐</div>
+        <div class="label">Overdue Pending</div>
+        <div class="value" id="overdueCount">0</div>
+      </div>
+    </section>
+
+    <!-- Charts + Table -->
+    <section class="grid" id="dashboard" style="display:none">
+
+      <div class="card wide">
+        <div class="card-header">
+          <div class="title">1 — Average Score Trend by Submission Date</div>
+          <div class="note">Shows how average performance changes over time.</div>
+        </div>
+        <div class="chart-divider"></div>
+        <div id="trendChart" class="plot"></div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div class="title">2 — Average Score per Subject</div>
+          <div class="note">Compares performance across Bangla, English, ICT, Math, Physics, Chemistry &amp; Biology.
+          </div>
+        </div>
+        <div class="chart-divider"></div>
+        <div id="subjectAvgChart" class="plot"></div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div class="title">3 — Assignment Status Breakdown</div>
+          <div class="note">Summarizes assignment progress by status.</div>
+        </div>
+        <div class="chart-divider"></div>
+        <div id="statusChart" class="plot"></div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div class="title">4 — Completed Assignments per Student</div>
+          <div class="note">Top students by completed or graded assignments.</div>
+        </div>
+        <div class="chart-divider"></div>
+        <div id="completionChart" class="plot"></div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div class="title">5 — Low Score &amp; Overdue Risk View</div>
+          <div class="note">Highlights students who may need extra support.</div>
+        </div>
+        <div class="chart-divider"></div>
+        <div id="riskChart" class="plot"></div>
+      </div>
+
+      <div class="card wide">
+        <div class="card-header">
+          <div class="title">Student Performance Table</div>
+          <div class="note">Scores below 50% and overdue pending assignments are highlighted.</div>
+        </div>
+        <div class="table-wrap" id="tableWrap"></div>
+      </div>
+
+    </section>
+
+    <section class="empty" id="emptyState">
+      <div class="empty-icon">📡</div>
+      Loading student performance data from Google Sheet…
+    </section>
+
+  </main>
+
+  <script>
+    const state = { raw: [] };
+const el = id => document.getElementById(id);
+
+const FIELD = {
+  student: "Student Name",
+  subject: "Subject",
+  score: "Assignment Score",
+  submissionDate: "Submission Date",
+  status: "Status",
+  email: "Student Email",
+  dueDate: "Due Date"
+};
+
+function parseDate(v) {
+  if (!v) return null;
+  const d = new Date(v);
+  return isNaN(d) ? null : d;
+}
+
+function iso(d) { return d ? d.toISOString().slice(0, 10) : ""; }
+
+function num(v) {
+  const n = Number(String(v ?? "").replace(/[^0-9.-]/g, ""));
+  return Number.isFinite(n) ? n : 0;
+}
+
+function fmt(n, d = 0) {
+  return new Intl.NumberFormat(undefined, { maximumFractionDigits: d }).format(n);
+}
+
+function safe(v) {
+  return String(v ?? "")
+    .replaceAll("&", "&amp;").replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;").replaceAll('"', "&quot;").replaceAll("'", "&#039;");
+}
+
+function mappedRows() {
+  return state.raw.map(r => ({
+    student: String(r[FIELD.student] ?? "Unknown"),
+    subject: String(r[FIELD.subject] ?? "Unknown"),
+    score: num(r[FIELD.score]),
+    submissionDate: parseDate(r[FIELD.submissionDate]),
+    status: String(r[FIELD.status] ?? "Unknown"),
+    email: String(r[FIELD.email] ?? ""),
+    dueDate: parseDate(r[FIELD.dueDate])
+  })).filter(r => r.student && r.subject && Number.isFinite(r.score));
+}
+
+function isCompleted(status) {
+  const s = status.toLowerCase();
+  return s.includes("completed") || s.includes("graded") || s === "complete";
+}
+
+function isOverdue(r) {
+  const today = new Date();
+  return r.dueDate && r.dueDate < today && !isCompleted(r.status);
+}
+
+function populateFilters(rows) {
+  const subjects = [...new Set(rows.map(r => r.subject))].sort();
+  const statuses = [...new Set(rows.map(r => r.status))].sort();
+
+  el("subjectFilter").innerHTML =
+    `<option value="__all__">All Subjects</option>` +
+    subjects.map(s => `<option value="${safe(s)}">${safe(s)}</option>`).join("");
+
+  el("statusFilter").innerHTML =
+    `<option value="__all__">All Statuses</option>` +
+    statuses.map(s => `<option value="${safe(s)}">${safe(s)}</option>`).join("");
+
+  const dates = rows.map(r => r.dueDate).filter(Boolean).sort((a, b) => a - b);
+  if (dates.length) {
+    el("fromDate").value = iso(dates[0]);
+    el("toDate").value = iso(dates[dates.length - 1]);
+  }
+}
+
+function filteredRows() {
+  const rows = mappedRows();
+  const subject = el("subjectFilter").value;
+  const status = el("statusFilter").value;
+  const search = el("searchInput").value.trim().toLowerCase();
+  const from = el("fromDate").value ? new Date(el("fromDate").value + "T00:00:00") : null;
+  const to = el("toDate").value ? new Date(el("toDate").value + "T23:59:59") : null;
+
+  return rows.filter(r =>
+    (subject === "__all__" || r.subject === subject) &&
+    (status === "__all__" || r.status === status) &&
+    (!from || !r.dueDate || r.dueDate >= from) &&
+    (!to || !r.dueDate || r.dueDate <= to) &&
+    (!search || `${r.student} ${r.email}`.toLowerCase().includes(search))
+  );
+}
+
+function group(rows, keyFn, valFn) {
+  const map = new Map();
+  rows.forEach(r => {
+    const key = keyFn(r);
+    const val = valFn(r);
+    const cur = map.get(key) || { sum: 0, count: 0 };
+    cur.sum += val;
+    cur.count += 1;
+    map.set(key, cur);
+  });
+  return [...map.entries()].map(([key, v]) => ({
+    key, sum: v.sum, count: v.count, avg: v.sum / v.count
+  }));
+}
+
+/* Dark-theme Plotly base layout */
+function chartLayout(extra = {}) {
+  return {
+    margin: { t: 20, r: 20, b: 60, l: 60 },
+    paper_bgcolor: "rgba(0,0,0,0)",
+    plot_bgcolor: "rgba(0,0,0,0)",
+    font: { family: "'DM Sans', Arial", color: "#7c7f9a", size: 12 },
+    hoverlabel: {
+      bgcolor: "#181b27",
+      bordercolor: "rgba(255,255,255,.1)",
+      font: { color: "#f0f2fc", family: "'DM Sans', Arial" }
+    },
+    colorway: ["#4f7cff","#2de3c5","#3ddc84","#ffb547","#ff5c6e","#b57bff","#ff8c69"],
+    xaxis: {
+      gridcolor: "rgba(255,255,255,.04)",
+      linecolor: "rgba(255,255,255,.08)",
+      tickfont: { color: "#4a4d66" },
+      title: { font: { color: "#7c7f9a" } },
+      ...(extra.xaxis || {})
+    },
+    yaxis: {
+      gridcolor: "rgba(255,255,255,.04)",
+      linecolor: "rgba(255,255,255,.08)",
+      tickfont: { color: "#4a4d66" },
+      title: { font: { color: "#7c7f9a" } },
+      ...(extra.yaxis || {})
+    },
+    ...extra
+  };
+}
+
+const cfg = { responsive: true, displaylogo: false, displayModeBar: false };
+
+function render() {
+  const rows = filteredRows();
+  const total = rows.length;
+  const avg = total ? rows.reduce((a, r) => a + r.score, 0) / total : 0;
+  const completed = rows.filter(r => isCompleted(r.status)).length;
+  const low = rows.filter(r => r.score < 50).length;
+  const overdue = rows.filter(isOverdue).length;
+
+  el("filterStatus").innerHTML = `Showing <strong>${total}</strong> records from Google Sheets.`;
+  el("totalRecords").textContent = fmt(total);
+  el("avgScore").textContent = fmt(avg, 1) + "%";
+  el("completedCount").textContent = fmt(completed);
+  el("lowScoreCount").textContent = fmt(low);
+  el("overdueCount").textContent = fmt(overdue);
+
+  renderTrend(rows);
+  renderSubjectAverage(rows);
+  renderStatus(rows);
+  renderCompletion(rows);
+  renderRisk(rows);
+  renderTable(rows);
+
+  el("filterPanel").style.display = "block";
+  el("kpis").style.display = "grid";
+  el("dashboard").style.display = "grid";
+  el("emptyState").style.display = "none";
+}
+
+function renderTrend(rows) {
+  const data = group(
+    rows.filter(r => r.submissionDate),
+    r => iso(r.submissionDate), r => r.score
+  ).sort((a, b) => new Date(a.key) - new Date(b.key));
+
+  Plotly.newPlot("trendChart", [{
+    x: data.map(d => d.key),
+    y: data.map(d => d.avg),
+    type: "scatter",
+    mode: "lines+markers",
+    line: { width: 3, color: "#4f7cff", shape: "spline" },
+    marker: { size: 7, color: "#4f7cff", line: { width: 2, color: "#12141e" } },
+    fill: "tozeroy",
+    fillcolor: "rgba(79,124,255,.08)",
+    hovertemplate: "Date: %{x}<br>Avg Score: <b>%{y:.1f}%</b><extra></extra>"
+  }], chartLayout({
+    xaxis: { title: "Submission Date" },
+    yaxis: { title: "Average Score", range: [0, 105] }
+  }), cfg);
+}
+
+function renderSubjectAverage(rows) {
+  const data = group(rows, r => r.subject, r => r.score).sort((a, b) => b.avg - a.avg);
+  const colors = ["#4f7cff","#2de3c5","#3ddc84","#ffb547","#ff5c6e","#b57bff","#ff8c69"];
+
+  Plotly.newPlot("subjectAvgChart", [{
+    x: data.map(d => d.key),
+    y: data.map(d => d.avg),
+    type: "bar",
+    marker: { color: colors.slice(0, data.length), opacity: .85 },
+    text: data.map(d => fmt(d.avg, 1) + "%"),
+    textposition: "outside",
+    textfont: { color: "#f0f2fc", size: 11 },
+    hovertemplate: "%{x}<br>Avg Score: <b>%{y:.1f}%</b><extra></extra>"
+  }], chartLayout({
+    xaxis: { title: "Subject" },
+    yaxis: { title: "Average Score", range: [0, 115] }
+  }), cfg);
+}
+
+function renderStatus(rows) {
+  const count = new Map();
+  rows.forEach(r => count.set(r.status, (count.get(r.status) || 0) + 1));
+
+  Plotly.newPlot("statusChart", [{
+    labels: [...count.keys()],
+    values: [...count.values()],
+    type: "pie",
+    hole: .6,
+    textinfo: "label+percent",
+    textfont: { color: "#f0f2fc" },
+    marker: { colors: ["#4f7cff","#2de3c5","#3ddc84","#ffb547","#ff5c6e","#b57bff"] },
+    hovertemplate: "%{label}<br><b>%{value}</b> records (%{percent})<extra></extra>"
+  }], {
+    ...chartLayout(),
+    margin: { t: 20, r: 10, b: 30, l: 10 },
+    legend: { orientation: "h", y: -.12, font: { color: "#7c7f9a" } }
+  }, cfg);
+}
+
+function renderCompletion(rows) {
+  const data = group(rows.filter(r => isCompleted(r.status)), r => r.student, r => 1)
+    .sort((a, b) => b.count - a.count).slice(0, 12);
+
+  Plotly.newPlot("completionChart", [{
+    x: data.map(d => d.count),
+    y: data.map(d => d.key),
+    type: "bar",
+    orientation: "h",
+    marker: { color: "#2de3c5", opacity: .82 },
+    hovertemplate: "%{y}<br>Completed: <b>%{x}</b><extra></extra>"
+  }], chartLayout({
+    margin: { t: 20, r: 20, b: 50, l: 140 },
+    xaxis: { title: "Completed / Graded Count", rangemode: "tozero" },
+    yaxis: { automargin: true }
+  }), cfg);
+}
+
+function renderRisk(rows) {
+  const data = group(rows, r => r.student,
+    r => (r.score < 50 ? 1 : 0) + (isOverdue(r) ? 1 : 0)
+  ).filter(d => d.sum > 0).sort((a, b) => b.sum - a.sum).slice(0, 12);
+
+  Plotly.newPlot("riskChart", [{
+    x: data.map(d => d.sum),
+    y: data.map(d => d.key),
+    type: "bar",
+    orientation: "h",
+    marker: { color: "#ff5c6e", opacity: .82 },
+    hovertemplate: "%{y}<br>Risk Items: <b>%{x}</b><extra></extra>"
+  }], chartLayout({
+    margin: { t: 20, r: 20, b: 50, l: 140 },
+    xaxis: { title: "Low Score + Overdue Count", rangemode: "tozero" },
+    yaxis: { automargin: true }
+  }), cfg);
+}
+
+function renderTable(rows) {
+  const sorted = [...rows].sort((a, b) =>
+    a.student.localeCompare(b.student) || a.subject.localeCompare(b.subject)
+  );
+
+  el("tableWrap").innerHTML = `
+    <table>
+      <thead>
+        <tr>
+          <th>Student</th><th>Email</th><th>Subject</th>
+          <th>Score</th><th>Status</th>
+          <th>Submission Date</th><th>Due Date</th><th>Flags</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${sorted.map(r => {
+          const flags = [];
+          if (r.score < 50) flags.push(`<span class="badge red">Low Score</span>`);
+          if (isOverdue(r)) flags.push(`<span class="badge yellow">Overdue</span>`);
+          if (isCompleted(r.status)) flags.push(`<span class="badge green">Completed</span>`);
+          if (!flags.length) flags.push(`<span class="badge blue">On Track</span>`);
+          return `
+            <tr>
+              <td style="font-weight:600;color:#fff">${safe(r.student)}</td>
+              <td style="color:var(--muted)">${safe(r.email)}</td>
+              <td>${safe(r.subject)}</td>
+              <td class="${r.score < 50 ? "low-score" : ""}">${fmt(r.score, 1)}%</td>
+              <td>${safe(r.status)}</td>
+              <td>${r.submissionDate ? iso(r.submissionDate) : "—"}</td>
+              <td class="${isOverdue(r) ? "overdue" : ""}">${r.dueDate ? iso(r.dueDate) : "—"}</td>
+              <td>${flags.join(" ")}</td>
+            </tr>`;
+        }).join("")}
+      </tbody>
+    </table>`;
+}
+
+function loadRows(rows, label) {
+  state.raw = rows.filter(r => r && typeof r === "object" && !Array.isArray(r));
+  if (!state.raw.length) throw new Error("No valid rows found in the Assignments sheet.");
+  populateFilters(mappedRows());
+  el("uploadStatus").innerHTML = `<strong>${safe(label)}:</strong> ${state.raw.length} records loaded.`;
+  render();
+}
+
+function loadSheetData() {
+  el("uploadStatus").innerHTML = "Loading data from Google Sheet…";
+  google.script.run
+    .withSuccessHandler(data => loadRows(data, "Google Sheet"))
+    .withFailureHandler(error => {
+      el("uploadStatus").innerHTML = `<span style="color:var(--red);font-weight:700">${safe(error.message)}</span>`;
+    })
+    .getStudentData();
+}
+
+el("refreshBtn").addEventListener("click", loadSheetData);
+["subjectFilter","statusFilter","fromDate","toDate","searchInput"].forEach(id => {
+  el(id).addEventListener("input", render);
+});
+window.addEventListener("load", loadSheetData);
+  </script>
+</body>
+
+</html>
