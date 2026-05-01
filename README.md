@@ -12,7 +12,7 @@ This project provides real-time insights into student performance, tracks assign
 https://script.google.com/macros/s/AKfycbwg1N-steAcbBXiArpiK7we0g47JHYHpPtswUXROO40ZnLal7LfN1B4CtdMl7XLFSQK/exec
 
 ---
-![image alt](https://github.com/irfanulkabirhira/Movie-Recommendation-System-using-Content-Based-Filtering-Streamlit-Hugging-Face-Deployment-/blob/eee1bd98470aa656cac3042ca5f49f248478f9bf/Demo%20Image.png)
+![image alt](https://github.com/irfanulkabirhira/Student-Performance-Dashboard-Using-app-script/blob/4e8c1f98bf7d6d08a45e794c32fc7534e4c2912f/Screenshot%202026-05-01%20080310.png)
 
 ## ✨ Features
 
